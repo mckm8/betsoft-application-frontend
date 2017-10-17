@@ -8,6 +8,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
+import {AuthenticationService} from "./shared/services/authentication.service";
+import {UserService} from "./shared/services/user.service";
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -32,7 +34,11 @@ export function HttpLoaderFactory(http: Http) {
             }
         })
     ],
-    providers: [AuthGuard],
+    providers: [
+        AuthGuard,
+        AuthenticationService,
+        UserService
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
