@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import {UserService} from "../../services/user.service";
+import {UserData} from "./UserData";
 
 @Component({
     selector: 'app-header',
@@ -10,13 +12,30 @@ import { TranslateService } from '@ngx-translate/core';
 export class HeaderComponent implements OnInit {
 
     pushRightClass: string = 'push-right';
-
-    constructor(private translate: TranslateService, public router: Router) {
+    userData: UserData;
+    constructor(private translate: TranslateService,
+                private userService: UserService,
+                public router: Router) {
         this.router.events.subscribe((val) => {
             if (val instanceof NavigationEnd && window.innerWidth <= 992 && this.isToggled()) {
                 this.toggleSidebar();
             }
         });
+        userService.getLoggedInUserData().subscribe(
+            result => {
+                if (result) {
+                    this.userData = new UserData(result.username, result.firstName, result.secondName, result.email);
+                    console.log(this.userData.userCaption);
+
+                } else {
+                    console.log('pusta odpowiedz')
+                    // this.error = 'Username or password is incorrect';
+                }
+            },
+            error => {
+                console.log('BLAD');
+            }
+        );
     }
 
     ngOnInit() {}
@@ -31,10 +50,6 @@ export class HeaderComponent implements OnInit {
         dom.classList.toggle(this.pushRightClass);
     }
 
-    rltAndLtr() {
-        const dom: any = document.querySelector('body');
-        dom.classList.toggle('rtl');
-    }
 
     onLoggedout() {
         localStorage.removeItem('access_token');

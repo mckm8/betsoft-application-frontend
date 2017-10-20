@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { routerTransition } from '../router.animations';
+import {Component, Input} from "@angular/core";
+import {Router} from "@angular/router";
+import {routerTransition} from "../router.animations";
 import {AuthenticationService} from "../shared/services/authentication.service";
 import {UserService} from "../shared/services/user.service";
+import {LoginData} from "./login-data";
+import {FormGroup, FormBuilder} from "@angular/forms";
 
 @Component({
     selector: 'app-login',
@@ -10,23 +12,34 @@ import {UserService} from "../shared/services/user.service";
     styleUrls: ['./login.component.scss'],
     animations: [routerTransition()]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
-    constructor(private router: Router, private authenticationService: AuthenticationService, private userService: UserService) {
+    loginForm: FormGroup;
+
+    constructor(private router: Router,
+                private authenticationService: AuthenticationService,
+                private userService: UserService,
+                private fb: FormBuilder) {
+        this.createForm();
     }
 
-    ngOnInit() {
+    createForm() {
+        this.loginForm = this.fb.group({
+            username: '',
+            password: ''
+        })
     }
 
-    onLoggedin() {
-        this.login();
-        // this.userService.login(token);
+    onSubmit() {
+        console.log(this.loginForm.value.username);
+        console.log(this.loginForm.value.password);
+        this.login(this.loginForm.value.username,
+            this.loginForm.value.password);
     }
 
-    login() {
+    login(username: string, password: string) {
         // this.loading = true;
-
-        this.authenticationService.login("user","password")
+        this.authenticationService.login(username, password)
             .subscribe(
                 result => {
                     // this.loading = false;
@@ -48,11 +61,6 @@ export class LoginComponent implements OnInit {
     }
 
     private navigateAfterSuccess() {
-        // if (this.redirectUrl) {
-        //     this.router.navigateByUrl(this.redirectUrl);
-        // } else {
-        console.log("navigating...")
-            this.router.navigate(['/dashboard']);
-        // }
+        this.router.navigate(['/dashboard']);
     }
 }
